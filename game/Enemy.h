@@ -1,24 +1,22 @@
 #ifndef ENEMY_H
 #define ENEMY_H
+
 #include <graphics.h>
-#include <vector>
 #include "Map.h"
 
-class Enemy {
-public:
+typedef struct {
 	double x, y;             
 	double speed;            
 	int maxHp;               
 	int hp;                  
 	int targetWaypointIndex; 
-	bool active;             
-	bool reachedBase;        
-	
-	// 【新增】受击闪烁计时器
+	int active;             // C语言中用 int 代表布尔值 (1真, 0假)
+	int reachedBase;        
 	double hitFlashTimer;    
-	
-	Enemy(Point startPos);
-	void update(double deltaTime, const std::vector<Point>& waypoints);
-	void draw();
-};
+} Enemy;
+
+void Enemy_init(Enemy* e, Point startPos);
+void Enemy_update(Enemy* e, double deltaTime, Point* waypoints, int waypointCount);
+void Enemy_draw(Enemy* e);
+
 #endif

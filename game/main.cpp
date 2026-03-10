@@ -1,37 +1,41 @@
 #include <graphics.h>
 #include <time.h>
-#include "GameManager.h" // 引入游戏大管家
+#include "GameManager.h"
 
 int main() {
-	// 1. 初始化图形窗口 (宽 1024, 高 768)
-	setinitmode(INIT_RENDERMANUAL | INIT_ANIMATION);
-	initgraph(1024, 768);
-	setcaption("千年城影：华夏防御史"); // 游戏标题
+	// 1. 初始化 EGE 窗口 (1024x768)，开启手动渲染模式（防止画面闪烁）
+	initgraph(1024, 768, INIT_RENDERMANUAL);
 	
-	// 实例化游戏大管家并初始化
-	GameManager game;
-	game.init();
+	// 2. 声明大管家结构体变量
+	GameManager gm;
 	
-	// 记录上一帧的时间
-	long lastTime = clock();
+	// 3. 传入结构体指针，进行游戏初始化
+	GameManager_init(&gm);
 	
-	// 2. 游戏主循环 (Game Loop)
-	while (is_run()) {
-		// 计算 deltaTime，保证 10~30 分钟的游玩时长不会因为掉帧而变慢
-		long currentTime = clock();
-		double deltaTime = (double)(currentTime - lastTime) / CLOCKS_PER_SEC;
+	// 用于计算每一帧经过的时间 (deltaTime)
+	clock_t lastTime = clock();
+	double deltaTime = 0.0;
+	
+	// 4. 游戏主循环 (is_run() 检查窗口是否被关闭)
+	for (; is_run(); delay_fps(60)) {
+		// 计算两帧之间的时间差（秒）
+		clock_t currentTime = clock();
+		deltaTime = (double)(currentTime - lastTime) / CLOCKS_PER_SEC;
 		lastTime = currentTime;
 		
-		// 将三大核心任务委托给 GameManager
-		game.processInput();
-		game.updateLogic(deltaTime);
-		game.renderGraphics();
+		// --- 核心生命周期 ---
 		
-		// 3. 帧率控制，锁定 60 FPS
-		delay_fps(60); 
+		// 处理用户输入 (鼠标点击建塔)
+		GameManager_processInput(&gm);
+		
+		// 更新所有游戏逻辑 (塔的攻击、敌人的移动、特效的生命周期)
+		GameManager_updateLogic(&gm, deltaTime);
+		
+		// 渲染画面
+		GameManager_renderGraphics(&gm);
 	}
 	
-	// 清理并关闭窗口
+	// 5. 游戏结束，关闭绘图窗口
 	closegraph();
 	return 0;
 }

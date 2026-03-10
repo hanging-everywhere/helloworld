@@ -1,60 +1,57 @@
 #include "Enemy.h"
 #include <math.h>
 
-Enemy::Enemy(Point startPos) {
-	x = startPos.x;
-	y = startPos.y;
-	speed = 60.0;             
-	maxHp = 100;              
-	hp = maxHp;
-	targetWaypointIndex = 1;  
-	active = true;
-	reachedBase = false;
-	hitFlashTimer = 0.0; // 初始不闪烁
+void Enemy_init(Enemy* e, Point startPos) {
+	e->x = startPos.x;
+	e->y = startPos.y;
+	e->speed = 60.0;             
+	e->maxHp = 100;              
+	e->hp = e->maxHp;
+	e->targetWaypointIndex = 1;  
+	e->active = 1;
+	e->reachedBase = 0;
+	e->hitFlashTimer = 0.0; 
 }
 
-void Enemy::update(double deltaTime, const std::vector<Point>& waypoints) {
-	if (!active) return;
+void Enemy_update(Enemy* e, double deltaTime, Point* waypoints, int waypointCount) {
+	if (!e->active) return;
 	
-	// 更新闪烁倒计时
-	if (hitFlashTimer > 0) hitFlashTimer -= deltaTime;
+	if (e->hitFlashTimer > 0) e->hitFlashTimer -= deltaTime;
 	
-	if (targetWaypointIndex < (int)waypoints.size()) {
-		Point target = waypoints[targetWaypointIndex];
-		double dx = target.x - x;
-		double dy = target.y - y;
+	if (e->targetWaypointIndex < waypointCount) {
+		Point target = waypoints[e->targetWaypointIndex];
+		double dx = target.x - e->x;
+		double dy = target.y - e->y;
 		double distance = sqrt(dx * dx + dy * dy);
 		
 		if (distance < 2.0) {
-			targetWaypointIndex++;
+			e->targetWaypointIndex++;
 		} else {
-			double moveDist = speed * deltaTime;
+			double moveDist = e->speed * deltaTime;
 			if (moveDist > distance) moveDist = distance; 
-			x += (dx / distance) * moveDist;
-			y += (dy / distance) * moveDist;
+			e->x += (dx / distance) * moveDist;
+			e->y += (dy / distance) * moveDist;
 		}
 	} else {
-		active = false;
-		reachedBase = true;
+		e->active = 0;
+		e->reachedBase = 1;
 	}
 }
 
-void Enemy::draw() {
-	if (!active) return;
+void Enemy_draw(Enemy* e) {
+	if (!e->active) return;
 	
-	// 【特效】受击闪烁白光，否则是暗红色野兽
-	if (hitFlashTimer > 0) {
-		setfillcolor(EGERGB(255, 255, 255)); // 纯白闪烁
+	if (e->hitFlashTimer > 0) {
+		setfillcolor(EGERGB(255, 255, 255)); 
 	} else {
-		setfillcolor(EGERGB(150, 30, 30));   // 正常暗红
+		setfillcolor(EGERGB(150, 30, 30));   
 	}
-	fillcircle((int)x, (int)y, 15);
+	fillcircle((int)e->x, (int)e->y, 15);
 	
-	// 绘制血条
 	int barWidth = 30;
-	int currentBar = (int)((double)hp / maxHp * barWidth);
+	int currentBar = (int)((double)e->hp / e->maxHp * barWidth);
 	setfillcolor(EGERGB(100, 0, 0));
-	bar((int)x - 15, (int)y - 25, (int)x + 15, (int)y - 20);
+	bar((int)e->x - 15, (int)e->y - 25, (int)e->x + 15, (int)e->y - 20);
 	setfillcolor(EGERGB(0, 200, 0));
-	bar((int)x - 15, (int)y - 25, (int)x - 15 + currentBar, (int)y - 20);
+	bar((int)e->x - 15, (int)e->y - 25, (int)e->x - 15 + currentBar, (int)e->y - 20);
 }

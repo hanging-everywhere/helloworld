@@ -14,10 +14,10 @@ CFLAGS   = $(INCS) "-fno-ms-extensions" "-O2" "-pipe" "-Werror=implicit-int" "-W
 NASM_FLAGS   =  "-f" "elf64"
 WINDRESFLAGS = 
 RES      = game_private.res
-OBJ      = main.o Map.o GameManager.o Tower.o Enemy.o $(RES)
+OBJ      = Map.o Enemy.o GameManager.o main.o Tower.o $(RES)
 BIN      = game.exe
-LINKOBJ  = "main.o" "Map.o" "GameManager.o" "Tower.o" "Enemy.o" "game_private.res"
-CLEANOBJ = "main.o" "Map.o" "GameManager.o" "Tower.o" "Enemy.o" "game_private.res" "game.exe"
+LINKOBJ  = "Map.o" "Enemy.o" "GameManager.o" "main.o" "Tower.o" "game_private.res"
+CLEANOBJ = "Map.o" "Enemy.o" "GameManager.o" "main.o" "Tower.o" "game_private.res" "game.exe"
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -30,20 +30,20 @@ game.exe: $(OBJ)
 
 	$(CXX) $(LINKOBJ) -o "game.exe" $(LIBS)
 
-main.o: main.cpp Map.h GameManager.h Enemy.h Tower.h
-	$(CXX) -c "main.cpp" -o "main.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
-
-Map.o: Map.cpp Map.h
+Map.o: Map.cpp Enemy.h Tower.h Map.h GameManager.h
 	$(CXX) -c "Map.cpp" -o "Map.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
 
-GameManager.o: GameManager.cpp Map.h GameManager.h Enemy.h Tower.h
+Enemy.o: Enemy.cpp Enemy.h Tower.h Map.h GameManager.h
+	$(CXX) -c "Enemy.cpp" -o "Enemy.o" $(CXXFLAGS) 
+
+GameManager.o: GameManager.cpp Enemy.h Tower.h Map.h GameManager.h
 	$(CXX) -c "GameManager.cpp" -o "GameManager.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
 
-Tower.o: Tower.cpp Map.h GameManager.h Enemy.h Tower.h
-	$(CXX) -c "Tower.cpp" -o "Tower.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
+main.o: main.cpp Enemy.h Tower.h Map.h GameManager.h
+	$(CXX) -c "main.cpp" -o "main.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
 
-Enemy.o: Enemy.cpp Map.h Enemy.h
-	$(CXX) -c "Enemy.cpp" -o "Enemy.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
+Tower.o: Tower.cpp Enemy.h Tower.h Map.h GameManager.h
+	$(CXX) -c "Tower.cpp" -o "Tower.o" $(CXXFLAGS)  -finput-charset=UTF-8 -fexec-charset=gbk
 
 game_private.res: game_private.rc 
 	$(WINDRES) -i "game_private.rc" --input-format=rc -o "game_private.res" -O coff $(WINDRESFLAGS) 

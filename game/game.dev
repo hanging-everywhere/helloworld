@@ -44,7 +44,7 @@ UseUTF8 = 1
 
 
 [Unit1]
-FileName = Map.h
+FileName = Enemy.h
 CompileCpp = 0
 Folder = 头文件
 Compile = 0
@@ -77,45 +77,6 @@ SyncProduct = 1
 
 
 [Unit2]
-FileName = main.cpp
-CompileCpp = 1
-Folder = 源文件
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit3]
-FileName = GameManager.h
-CompileCpp = 0
-Folder = 头文件
-Compile = 0
-Link = 0
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit4]
-FileName = Enemy.h
-CompileCpp = 0
-Folder = 头文件
-Compile = 0
-Link = 0
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit5]
 FileName = Map.cpp
 CompileCpp = 1
 Folder = 源文件
@@ -128,20 +89,7 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
-[Unit6]
-FileName = GameManager.cpp
-CompileCpp = 1
-Folder = 源文件
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit7]
+[Unit3]
 FileName = Tower.h
 CompileCpp = 0
 Folder = 头文件
@@ -154,8 +102,21 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
-[Unit8]
-FileName = Tower.cpp
+[Unit4]
+FileName = GameManager.h
+CompileCpp = 0
+Folder = 头文件
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
+[Unit5]
+FileName = GameManager.cpp
 CompileCpp = 1
 Folder = 源文件
 Compile = 1
@@ -167,8 +128,47 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
-[Unit9]
+[Unit6]
 FileName = Enemy.cpp
+CompileCpp = 1
+Folder = 源文件
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
+[Unit7]
+FileName = main.cpp
+CompileCpp = 1
+Folder = 源文件
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
+[Unit8]
+FileName = Map.h
+CompileCpp = 0
+Folder = 头文件
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
+[Unit9]
+FileName = Tower.cpp
 CompileCpp = 1
 Folder = 源文件
 Compile = 1

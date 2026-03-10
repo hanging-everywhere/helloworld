@@ -3,51 +3,52 @@
 #include <math.h>
 #include <time.h>
 
-GameManager::GameManager() {
-	currentState = MENU;
+void GameManager_init(GameManager* gm) {
+	Map_init(&gm->gameMap);
+	gm->enemyCount = 0;
+	gm->towerCount = 0;
+	gm->floatTextCount = 0;
+	gm->projectileCount = 0;
+	
+	gm->baseHealth = 10;    
+	gm->money = 150;        
+	gm->currentWave = 0;
+	gm->isWaveActive = 0;
+	gm->waveDelayTimer = 3.0; 
+	gm->warningTimer = 0.0;
+	gm->currentState = PLAYING_LEVEL_1; 
 }
 
-void GameManager::init() {
-	gameMap.init();
-	baseHealth = 10;    
-	money = 150;        
-	currentWave = 0;
-	isWaveActive = false;
-	waveDelayTimer = 3.0; 
-	warningTimer = 0.0;
-	currentState = PLAYING_LEVEL_1; 
+void GameManager_startNextWave(GameManager* gm) {
+	gm->currentWave++;
+	gm->enemiesSpawned = 0;
+	gm->isWaveActive = 1;
+	if (gm->currentWave == 1) { gm->enemiesToSpawn = 5; gm->currentSpawnInterval = 2.0; } 
+	else if (gm->currentWave == 2) { gm->enemiesToSpawn = 10; gm->currentSpawnInterval = 1.5; } 
+	else if (gm->currentWave == 3) { gm->enemiesToSpawn = 15; gm->currentSpawnInterval = 1.0; } 
+	else { gm->isWaveActive = 0; gm->currentState = VICTORY; return; }
+	gm->spawnTimer = gm->currentSpawnInterval; 
 }
 
-void GameManager::startNextWave() {
-	currentWave++;
-	enemiesSpawned = 0;
-	isWaveActive = true;
-	if (currentWave == 1) { enemiesToSpawn = 5; currentSpawnInterval = 2.0; } 
-	else if (currentWave == 2) { enemiesToSpawn = 10; currentSpawnInterval = 1.5; } 
-	else if (currentWave == 3) { enemiesToSpawn = 15; currentSpawnInterval = 1.0; } 
-	else { isWaveActive = false; currentState = VICTORY; return; }
-	spawnTimer = currentSpawnInterval; 
-}
-
-void GameManager::processInput() {
-	if (currentState != PLAYING_LEVEL_1) return;
+void GameManager_processInput(GameManager* gm) {
+	if (gm->currentState != PLAYING_LEVEL_1) return;
 	while (mousemsg()) {
 		mouse_msg msg = getmouse();
 		if (msg.is_down() && msg.is_left()) {
-			// 注意：因为顶部加了 40px 的 UI 栏，建造判断稍微下移，但网格坐标不受影响
 			int col = msg.x / CELL_SIZE;
 			int row = msg.y / CELL_SIZE;
 			if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
-				if (gameMap.grid[row][col] == 0) {
-					if (money >= 50) {
-						money -= 50;
-						gameMap.grid[row][col] = 2; 
-						Point center = gameMap.getCenter(row, col);
-						towers.push_back(Tower(center.x, center.y));
-					} else {
-						warningTimer = 1.0; 
-						warningX = msg.x;
-						warningY = msg.y;
+				if (gm->gameMap.grid[row][col] == 0) {
+					if (gm->money >= 50 && gm->towerCount < MAX_TOWERS) {
+						gm->money -= 50;
+						gm->gameMap.grid[row][col] = 2; 
+						Point center = Map_getCenter(row, col);
+						Tower_init(&gm->towers[gm->towerCount], center.x, center.y);
+						gm->towerCount++;
+					} else if (gm->money < 50) {
+						gm->warningTimer = 1.0; 
+						gm->warningX = msg.x;
+						gm->warningY = msg.y;
 					}
 				}
 			}
@@ -55,159 +56,167 @@ void GameManager::processInput() {
 	}
 }
 
-void GameManager::updateLogic(double deltaTime) {
-	if (currentState == GAME_OVER || currentState == VICTORY) return;
+void GameManager_updateLogic(GameManager* gm, double deltaTime) {
+	int i;
+	if (gm->currentState == GAME_OVER || gm->currentState == VICTORY) return;
 	
-	if (currentState == PLAYING_LEVEL_1) {
-		if (baseHealth <= 0) { currentState = GAME_OVER; return; }
-		if (warningTimer > 0) warningTimer -= deltaTime;
+	if (gm->currentState == PLAYING_LEVEL_1) {
+		if (gm->baseHealth <= 0) { gm->currentState = GAME_OVER; return; }
+		if (gm->warningTimer > 0) gm->warningTimer -= deltaTime;
 		
-		// 波次逻辑
-		if (isWaveActive) {
-			if (enemiesSpawned < enemiesToSpawn) {
-				spawnTimer -= deltaTime;
-				if (spawnTimer <= 0) {
-					enemies.push_back(Enemy(gameMap.waypoints[0]));
-					enemiesSpawned++;
-					spawnTimer = currentSpawnInterval; 
+		if (gm->isWaveActive) {
+			if (gm->enemiesSpawned < gm->enemiesToSpawn) {
+				gm->spawnTimer -= deltaTime;
+				if (gm->spawnTimer <= 0 && gm->enemyCount < MAX_ENEMIES) {
+					Enemy_init(&gm->enemies[gm->enemyCount], gm->gameMap.waypoints[0]);
+					gm->enemyCount++;
+					gm->enemiesSpawned++;
+					gm->spawnTimer = gm->currentSpawnInterval; 
 				}
-			} else if (enemies.empty()) {
-				isWaveActive = false;
-				waveDelayTimer = 5.0; 
+			} else if (gm->enemyCount == 0) {
+				gm->isWaveActive = 0;
+				gm->waveDelayTimer = 5.0; 
 			}
 		} else {
-			waveDelayTimer -= deltaTime;
-			if (waveDelayTimer <= 0) startNextWave();
+			gm->waveDelayTimer -= deltaTime;
+			if (gm->waveDelayTimer <= 0) GameManager_startNextWave(gm);
 		}
 		
-		// 更新塔 (传入特效数组)
-		for (size_t i = 0; i < towers.size(); i++) {
-			towers[i].update(deltaTime, enemies, gameMap.waypoints, projectiles, floatTexts);
+		for (i = 0; i < gm->towerCount; i++) {
+			Tower_update(&gm->towers[i], deltaTime, 
+						 gm->enemies, gm->enemyCount, 
+						 gm->gameMap.waypoints, 
+						 gm->projectiles, &gm->projectileCount, 
+						 gm->floatTexts, &gm->floatTextCount);
 		}
 		
-		// 更新敌人
-		for (auto it = enemies.begin(); it != enemies.end(); ) {
-			it->update(deltaTime, gameMap.waypoints);
-			if (it->reachedBase) {
-				baseHealth--;
-				it = enemies.erase(it); 
-			} else if (it->hp <= 0) {
-				money += 10;
-				it = enemies.erase(it);
-			} else { it++; }
+		for (i = 0; i < gm->enemyCount; ) {
+			Enemy_update(&gm->enemies[i], deltaTime, gm->gameMap.waypoints, gm->gameMap.waypointCount);
+			if (gm->enemies[i].reachedBase || gm->enemies[i].hp <= 0) {
+				if (gm->enemies[i].reachedBase) gm->baseHealth--;
+				else gm->money += 10;
+				
+				gm->enemies[i] = gm->enemies[gm->enemyCount - 1]; 
+				gm->enemyCount--; 
+			} else { 
+				i++; 
+			}
 		}
 		
-		// 【特效】更新抛物线石块
-		for (auto it = projectiles.begin(); it != projectiles.end(); ) {
-			it->life -= deltaTime;
-			if (it->life <= 0) it = projectiles.erase(it);
-			else it++;
+		for (i = 0; i < gm->projectileCount; ) {
+			gm->projectiles[i].life -= deltaTime;
+			if (gm->projectiles[i].life <= 0) {
+				gm->projectiles[i] = gm->projectiles[gm->projectileCount - 1];
+				gm->projectileCount--;
+			} else i++;
 		}
 		
-		// 【特效】更新浮动伤害数字
-		for (auto it = floatTexts.begin(); it != floatTexts.end(); ) {
-			it->life -= deltaTime;
-			it->y -= 30.0 * deltaTime; // 向上飘
-			if (it->life <= 0) it = floatTexts.erase(it);
-			else it++;
+		for (i = 0; i < gm->floatTextCount; ) {
+			gm->floatTexts[i].life -= deltaTime;
+			gm->floatTexts[i].y -= 30.0 * deltaTime;
+			if (gm->floatTexts[i].life <= 0) {
+				gm->floatTexts[i] = gm->floatTexts[gm->floatTextCount - 1];
+				gm->floatTextCount--;
+			} else i++;
 		}
 	}
 }
 
-void GameManager::renderGraphics() {
+void GameManager_renderGraphics(GameManager* gm) {
+	int i;
 	cleardevice();
 	
 	// 1. 画地图底层
-	gameMap.draw();
+	Map_draw(&gm->gameMap);
 	
-	// 2. 悬浮建造预览
-	int mx, my; mousepos(&mx, &my);
-	int hoverCol = mx / CELL_SIZE; int hoverRow = my / CELL_SIZE;
-	if (currentState == PLAYING_LEVEL_1 && hoverRow >= 0 && hoverRow < ROWS && hoverCol >= 0 && hoverCol < COLS) {
-		if (gameMap.grid[hoverRow][hoverCol] == 0) {
-			Point c = gameMap.getCenter(hoverRow, hoverCol);
+	// 2. 【已恢复】悬浮建造预览与射程显示
+	int mx, my; 
+	mousepos(&mx, &my); // 获取当前鼠标坐标
+	int hoverCol = mx / CELL_SIZE; 
+	int hoverRow = my / CELL_SIZE;
+	
+	// 确保鼠标在合法地图范围内，并且当前在游戏进行中
+	if (gm->currentState == PLAYING_LEVEL_1 && hoverRow >= 0 && hoverRow < ROWS && hoverCol >= 0 && hoverCol < COLS) {
+		// 如果是空地，可以建塔
+		if (gm->gameMap.grid[hoverRow][hoverCol] == 0) {
+			Point c = Map_getCenter(hoverRow, hoverCol);
+			
+			// 画一个半透明/较暗的虚影方块代表塔
 			setfillcolor(EGERGB(80, 80, 80));
 			bar(c.x - 20, c.y - 20, c.x + 20, c.y + 20);
-			setcolor(EGERGB(200, 200, 200));
-			circle(c.x, c.y, 150); // 射程圈
+			
+			// 画出白色的射程圆圈 (150 是我们在 Tower_init 里写的射程)
+			setcolor(EGERGB(255, 255, 255));
+			circle(c.x, c.y, 150); 
 		}
 	}
 	
-	// 3. 画实体
-	for (size_t i = 0; i < towers.size(); i++) towers[i].draw();
-	for (size_t i = 0; i < enemies.size(); i++) enemies[i].draw();
+	// 3. 画实体（塔和敌人）
+	for (i = 0; i < gm->towerCount; i++) Tower_draw(&gm->towers[i]);
+	for (i = 0; i < gm->enemyCount; i++) Enemy_draw(&gm->enemies[i]);
 	
-	// 4. 【氛围特效】呼吸的篝火大本营
-	Point basePos = gameMap.waypoints.back();
+	// 4. 大本营篝火动画
+	Point basePos = gm->gameMap.waypoints[gm->gameMap.waypointCount - 1];
 	double t = (double)clock() / CLOCKS_PER_SEC;
-	int pulse = (int)(sin(t * 8.0) * 6); // 火焰跳动偏移量
+	int pulse = (int)(sin(t * 8.0) * 6); 
 	
-	setfillcolor(EGERGB(255, 80, 0)); // 外层暗红火焰
+	setfillcolor(EGERGB(255, 80, 0)); 
 	fillcircle(basePos.x, basePos.y, 35 + pulse);
-	setfillcolor(EGERGB(255, 160, 0)); // 中层橙色火焰
+	setfillcolor(EGERGB(255, 160, 0)); 
 	fillcircle(basePos.x, basePos.y, 25 + pulse/2);
-	setfillcolor(EGERGB(255, 230, 100)); // 内层亮黄火心
+	setfillcolor(EGERGB(255, 230, 100)); 
 	fillcircle(basePos.x, basePos.y, 15);
 	
-	// 5. 【特效】画抛物线石块
-	for (size_t i = 0; i < projectiles.size(); i++) {
-		double prog = 1.0 - (projectiles[i].life / projectiles[i].maxLife);
-		double cx = projectiles[i].startX + (projectiles[i].targetX - projectiles[i].startX) * prog;
-		double cy = projectiles[i].startY + (projectiles[i].targetY - projectiles[i].startY) * prog;
-		// 减去 sin 计算出的高度，形成漂亮抛物线
+	// 5. 抛物线石块特效
+	for (i = 0; i < gm->projectileCount; i++) {
+		double prog = 1.0 - (gm->projectiles[i].life / gm->projectiles[i].maxLife);
+		double cx = gm->projectiles[i].startX + (gm->projectiles[i].targetX - gm->projectiles[i].startX) * prog;
+		double cy = gm->projectiles[i].startY + (gm->projectiles[i].targetY - gm->projectiles[i].startY) * prog;
 		cy -= 80.0 * sin(prog * 3.1415926); 
-		
 		setfillcolor(EGERGB(180, 180, 180));
 		fillcircle((int)cx, (int)cy, 5);
 	}
 	
-	// 6. UI 状态栏 (置于顶层)
+	// 6. UI 顶部状态栏
 	setfillcolor(EGERGB(30, 30, 30));
-	bar(0, 0, 1024, 40); // 顶部黑条
-	setcolor(EGERGB(100, 100, 100));
-	line(0, 40, 1024, 40);
-	
-	// 带阴影的精美文字字体
+	bar(0, 0, 1024, 40);
 	char infoText[128];
-	sprintf(infoText, "  Base HP: %d    Money: %d    Wave: %d/3", baseHealth, money, currentWave);
-	setbkmode(TRANSPARENT); // 文字背景透明
+	sprintf(infoText, "  Base HP: %d    Money: %d    Wave: %d/3", gm->baseHealth, gm->money, gm->currentWave);
+	setbkmode(TRANSPARENT); 
 	setfont(24, 0, "Consolas");
-	
-	setcolor(EGERGB(0, 0, 0)); // 黑阴影
-	outtextxy(12, 12, infoText);
-	setcolor(EGERGB(255, 215, 0)); // 金色主字
+	setcolor(EGERGB(255, 215, 0)); 
 	outtextxy(10, 10, infoText);
 	
-	// 7. 【特效】浮动伤害飘字
-	for (size_t i = 0; i < floatTexts.size(); i++) {
+	// 7. 伤害数字飘字
+	for (i = 0; i < gm->floatTextCount; i++) {
 		char dmgText[16];
-		sprintf(dmgText, "-%d", floatTexts[i].damage);
-		setcolor(EGERGB(0, 0, 0));
-		outtextxy((int)floatTexts[i].x + 1, (int)floatTexts[i].y + 1, dmgText);
+		sprintf(dmgText, "-%d", gm->floatTexts[i].damage);
 		setcolor(EGERGB(255, 50, 50));
-		outtextxy((int)floatTexts[i].x, (int)floatTexts[i].y, dmgText);
+		outtextxy((int)gm->floatTexts[i].x, (int)gm->floatTexts[i].y, dmgText);
 	}
 	
-	// 8. 资源不足提示
-	if (warningTimer > 0) {
-		int floatY = warningY - 20 - (int)((1.0 - warningTimer) * 30);
+	// 8. 【已恢复】资源不足提示文字
+	if (gm->warningTimer > 0) {
+		int floatY = gm->warningY - 20 - (int)((1.0 - gm->warningTimer) * 30);
 		setcolor(EGERGB(0, 0, 0));
-		outtextxy(warningX - 40 + 2, floatY + 2, "资源不足!");
+		outtextxy(gm->warningX - 40 + 2, floatY + 2, "资源不足!");
 		setcolor(EGERGB(255, 50, 50));
-		outtextxy(warningX - 40, floatY, "资源不足!");
+		outtextxy(gm->warningX - 40, floatY, "资源不足!");
 	}
 	
-	// 9. 游戏结束/胜利提示
-	if (!isWaveActive && currentState == PLAYING_LEVEL_1 && currentWave < 3) {
-		char delayText[64]; sprintf(delayText, "Next Wave in: %.1f s", waveDelayTimer);
-		setcolor(EGERGB(255, 255, 255)); setfont(40, 0, "Consolas");
+	// 9. 【已恢复】各种游戏状态结算提示
+	if (!gm->isWaveActive && gm->currentState == PLAYING_LEVEL_1 && gm->currentWave < 3) {
+		char delayText[64]; 
+		sprintf(delayText, "Next Wave in: %.1f s", gm->waveDelayTimer);
+		setcolor(EGERGB(255, 255, 255)); 
+		setfont(40, 0, "Consolas");
 		outtextxy(350, 350, delayText);
 	}
-	if (currentState == GAME_OVER) {
+	if (gm->currentState == GAME_OVER) {
 		setcolor(EGERGB(255, 0, 0)); setfont(80, 0, "Consolas"); outtextxy(300, 300, "GAME OVER");
 		setfont(30, 0, "Consolas"); outtextxy(350, 400, "火种熄灭，文明陨落"); 
 	}
-	if (currentState == VICTORY) {
+	if (gm->currentState == VICTORY) {
 		setcolor(EGERGB(0, 255, 0)); setfont(60, 0, "Consolas"); outtextxy(250, 300, "LEVEL 1 CLEARED");
 		setfont(30, 0, "Consolas"); outtextxy(320, 400, "先民挺过了野兽的侵袭...");
 	}

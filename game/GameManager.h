@@ -5,38 +5,33 @@
 #include "Map.h"
 #include "Enemy.h"
 #include "Tower.h"
-#include <vector>
 
-// 【新增】浮动伤害数字
-struct FloatingText {
-	double x, y;
-	int damage;
-	double life;
-};
-
-// 【新增】视觉抛物线投射物 (石块)
-struct VisualProjectile {
-	double startX, startY;
-	double targetX, targetY;
-	double life;
-	double maxLife;
-};
+// 宏定义最大容量取代 C++ 的动态数组扩容
+#define MAX_ENEMIES 200
+#define MAX_TOWERS 100
+#define MAX_PROJECTILES 300
+#define MAX_FLOAT_TEXTS 300
 
 enum GameState {
-	MENU, PLAYING_LEVEL_1, PLAYING_LEVEL_2, PLAYING_LEVEL_3, 
-	PLAYING_LEVEL_4, PLAYING_LEVEL_5, GAME_OVER, VICTORY
+	MENU, PLAYING_LEVEL_1, GAME_OVER, VICTORY
 };
 
-class GameManager {
-public:
-	GameState currentState;
+typedef struct {
+	enum GameState currentState;
 	Map gameMap;
-	std::vector<Enemy> enemies; 
-	std::vector<Tower> towers; 
 	
-	// 特效数组
-	std::vector<FloatingText> floatTexts;
-	std::vector<VisualProjectile> projectiles;
+	// C 语言的静态数组 + 计数器
+	Enemy enemies[MAX_ENEMIES]; 
+	int enemyCount;
+	
+	Tower towers[MAX_TOWERS]; 
+	int towerCount;
+	
+	FloatingText floatTexts[MAX_FLOAT_TEXTS];
+	int floatTextCount;
+	
+	VisualProjectile projectiles[MAX_PROJECTILES];
+	int projectileCount;
 	
 	int baseHealth;
 	int money;
@@ -48,16 +43,15 @@ public:
 	double currentSpawnInterval;
 	
 	double waveDelayTimer;     
-	bool isWaveActive;         
+	int isWaveActive;         
 	double warningTimer;   
 	int warningX, warningY;
-	
-	GameManager();
-	void init();
-	void startNextWave();      
-	void processInput();
-	void updateLogic(double deltaTime);
-	void renderGraphics();
-};
+} GameManager;
+
+void GameManager_init(GameManager* gm);
+void GameManager_startNextWave(GameManager* gm);
+void GameManager_processInput(GameManager* gm);
+void GameManager_updateLogic(GameManager* gm, double deltaTime);
+void GameManager_renderGraphics(GameManager* gm);
 
 #endif

@@ -1,31 +1,35 @@
 #include "Tower.h"
-#include "GameManager.h" // 引入为了使用结构体
 #include <math.h>
 
-Tower::Tower(int startX, int startY) {
-	x = startX;
-	y = startY;
-	range = 150;            
-	damage = 35;            
-	cooldown = 1.0;         
-	currentCooldown = 0.0;  
+void Tower_init(Tower* t, int startX, int startY) {
+	t->x = startX;
+	t->y = startY;
+	t->range = 150;            
+	t->damage = 35;            
+	t->cooldown = 1.0;         
+	t->currentCooldown = 0.0;  
 }
 
-void Tower::update(double deltaTime, std::vector<Enemy>& enemies, const std::vector<Point>& waypoints, 
-				   std::vector<VisualProjectile>& projectiles, std::vector<FloatingText>& floatTexts) {
-	if (currentCooldown > 0) currentCooldown -= deltaTime;
+void Tower_update(Tower* t, double deltaTime, 
+				  Enemy* enemies, int enemyCount, 
+				  Point* waypoints, 
+				  VisualProjectile* projs, int* projCount, 
+				  FloatingText* fTexts, int* fTextCount) {
 	
-	if (currentCooldown <= 0) {
+	if (t->currentCooldown > 0) t->currentCooldown -= deltaTime;
+	
+	if (t->currentCooldown <= 0) {
 		int bestEnemyIdx = -1;
 		double maxProgress = -1.0; 
+		int i;
 		
-		for (size_t i = 0; i < enemies.size(); i++) {
+		for (i = 0; i < enemyCount; i++) {
 			if (enemies[i].active) {
-				double dx = enemies[i].x - x;
-				double dy = enemies[i].y - y;
+				double dx = enemies[i].x - t->x;
+				double dy = enemies[i].y - t->y;
 				double distanceToTower = sqrt(dx * dx + dy * dy);
 				
-				if (distanceToTower <= range) {
+				if (distanceToTower <= t->range) {
 					double targetDx = waypoints[enemies[i].targetWaypointIndex].x - enemies[i].x;
 					double targetDy = waypoints[enemies[i].targetWaypointIndex].y - enemies[i].y;
 					double distToNextWaypoint = sqrt(targetDx * targetDx + targetDy * targetDy);
@@ -39,28 +43,33 @@ void Tower::update(double deltaTime, std::vector<Enemy>& enemies, const std::vec
 			}
 		}
 		
-		// 找到目标后
 		if (bestEnemyIdx != -1) {
-			enemies[bestEnemyIdx].hp -= damage;
-			enemies[bestEnemyIdx].hitFlashTimer = 0.1; // 触发白光闪烁
-			currentCooldown = cooldown;
+			enemies[bestEnemyIdx].hp -= t->damage;
+			enemies[bestEnemyIdx].hitFlashTimer = 0.1; 
+			t->currentCooldown = t->cooldown;
 			
-			// 【特效】生成空中飞行的抛物线石块 (飞行0.2秒)
-			VisualProjectile proj = {(double)x, (double)y, enemies[bestEnemyIdx].x, enemies[bestEnemyIdx].y, 0.2, 0.2};
-			projectiles.push_back(proj);
+			// C 语言方式添加石块特效
+			projs[*projCount].startX = (double)t->x;
+			projs[*projCount].startY = (double)t->y;
+			projs[*projCount].targetX = enemies[bestEnemyIdx].x;
+			projs[*projCount].targetY = enemies[bestEnemyIdx].y;
+			projs[*projCount].life = 0.2;
+			projs[*projCount].maxLife = 0.2;
+			(*projCount)++;
 			
-			// 【特效】生成飘字
-			FloatingText ft = {enemies[bestEnemyIdx].x, enemies[bestEnemyIdx].y - 20, damage, 0.8};
-			floatTexts.push_back(ft);
+			// C 语言方式添加飘字特效
+			fTexts[*fTextCount].x = enemies[bestEnemyIdx].x;
+			fTexts[*fTextCount].y = enemies[bestEnemyIdx].y - 20;
+			fTexts[*fTextCount].damage = t->damage;
+			fTexts[*fTextCount].life = 0.8;
+			(*fTextCount)++;
 		}
 	}
 }
 
-void Tower::draw() {
-	// 粗糙的石堆色
+void Tower_draw(Tower* t) {
 	setfillcolor(EGERGB(100, 100, 100));
-	bar(x - 20, y - 20, x + 20, y + 20);
-	// 塔顶的深色射击孔
+	bar(t->x - 20, t->y - 20, t->x + 20, t->y + 20);
 	setfillcolor(EGERGB(40, 40, 40));
-	fillcircle(x, y, 8);
+	fillcircle(t->x, t->y, 8);
 }
