@@ -41,17 +41,13 @@ void Enemy_update(Enemy* e, double deltaTime, Point* waypoints, int waypointCoun
 void Enemy_draw(Enemy* e) {
 	if (!e->active) return;
 	
-	if (e->hitFlashTimer > 0) {
-		setfillcolor(EGERGB(255, 255, 255)); 
-	} else {
-		setfillcolor(EGERGB(150, 30, 30));   
-	}
-	fillcircle((int)e->x, (int)e->y, 15);
+	// 受击闪烁白光，否则是暗红色
+	Color enemyColor = (e->hitFlashTimer > 0) ? WHITE : (Color){150, 30, 30, 255};
+	DrawCircle((int)e->x, (int)e->y, 15, enemyColor);
 	
+	// 绘制血条
 	int barWidth = 30;
 	int currentBar = (int)((double)e->hp / e->maxHp * barWidth);
-	setfillcolor(EGERGB(100, 0, 0));
-	bar((int)e->x - 15, (int)e->y - 25, (int)e->x + 15, (int)e->y - 20);
-	setfillcolor(EGERGB(0, 200, 0));
-	bar((int)e->x - 15, (int)e->y - 25, (int)e->x - 15 + currentBar, (int)e->y - 20);
+	DrawRectangle((int)e->x - 15, (int)e->y - 25, barWidth, 5, (Color){100, 0, 0, 255}); // 底色
+	DrawRectangle((int)e->x - 15, (int)e->y - 25, currentBar, 5, (Color){0, 200, 0, 255}); // 当前血量
 }

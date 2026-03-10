@@ -1,14 +1,11 @@
 #include "GameManager.h"
 #include <stdio.h>
 #include <math.h>
-#include <time.h>
 
 void GameManager_init(GameManager* gm) {
 	Map_init(&gm->gameMap);
-	gm->enemyCount = 0;
-	gm->towerCount = 0;
-	gm->floatTextCount = 0;
-	gm->projectileCount = 0;
+	gm->enemyCount = 0; gm->towerCount = 0;
+	gm->floatTextCount = 0; gm->projectileCount = 0;
 	
 	gm->baseHealth = 10;    
 	gm->money = 150;        
@@ -32,24 +29,26 @@ void GameManager_startNextWave(GameManager* gm) {
 
 void GameManager_processInput(GameManager* gm) {
 	if (gm->currentState != PLAYING_LEVEL_1) return;
-	while (mousemsg()) {
-		mouse_msg msg = getmouse();
-		if (msg.is_down() && msg.is_left()) {
-			int col = msg.x / CELL_SIZE;
-			int row = msg.y / CELL_SIZE;
-			if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
-				if (gm->gameMap.grid[row][col] == 0) {
-					if (gm->money >= 50 && gm->towerCount < MAX_TOWERS) {
-						gm->money -= 50;
-						gm->gameMap.grid[row][col] = 2; 
-						Point center = Map_getCenter(row, col);
-						Tower_init(&gm->towers[gm->towerCount], center.x, center.y);
-						gm->towerCount++;
-					} else if (gm->money < 50) {
-						gm->warningTimer = 1.0; 
-						gm->warningX = msg.x;
-						gm->warningY = msg.y;
-					}
+	
+	// Raylib 的输入检测极其简单清晰
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+		int mx = GetMouseX();
+		int my = GetMouseY();
+		int col = mx / CELL_SIZE;
+		int row = my / CELL_SIZE;
+		
+		if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+			if (gm->gameMap.grid[row][col] == 0) { // 0 代表空地草地
+				if (gm->money >= 50 && gm->towerCount < MAX_TOWERS) {
+					gm->money -= 50;
+					gm->gameMap.grid[row][col] = 2; // 2 标记为已有塔
+					Point center = Map_getCenter(row, col);
+					Tower_init(&gm->towers[gm->towerCount], center.x, center.y);
+					gm->towerCount++;
+				} else if (gm->money < 50) {
+					gm->warningTimer = 1.0; 
+					gm->warningX = mx;
+					gm->warningY = my;
 				}
 			}
 		}
@@ -69,13 +68,11 @@ void GameManager_updateLogic(GameManager* gm, double deltaTime) {
 				gm->spawnTimer -= deltaTime;
 				if (gm->spawnTimer <= 0 && gm->enemyCount < MAX_ENEMIES) {
 					Enemy_init(&gm->enemies[gm->enemyCount], gm->gameMap.waypoints[0]);
-					gm->enemyCount++;
-					gm->enemiesSpawned++;
+					gm->enemyCount++; gm->enemiesSpawned++;
 					gm->spawnTimer = gm->currentSpawnInterval; 
 				}
 			} else if (gm->enemyCount == 0) {
-				gm->isWaveActive = 0;
-				gm->waveDelayTimer = 5.0; 
+				gm->isWaveActive = 0; gm->waveDelayTimer = 5.0; 
 			}
 		} else {
 			gm->waveDelayTimer -= deltaTime;
@@ -83,11 +80,7 @@ void GameManager_updateLogic(GameManager* gm, double deltaTime) {
 		}
 		
 		for (i = 0; i < gm->towerCount; i++) {
-			Tower_update(&gm->towers[i], deltaTime, 
-						 gm->enemies, gm->enemyCount, 
-						 gm->gameMap.waypoints, 
-						 gm->projectiles, &gm->projectileCount, 
-						 gm->floatTexts, &gm->floatTextCount);
+			Tower_update(&gm->towers[i], deltaTime, gm->enemies, gm->enemyCount, gm->gameMap.waypoints, gm->projectiles, &gm->projectileCount, gm->floatTexts, &gm->floatTextCount);
 		}
 		
 		for (i = 0; i < gm->enemyCount; ) {
@@ -98,9 +91,7 @@ void GameManager_updateLogic(GameManager* gm, double deltaTime) {
 				
 				gm->enemies[i] = gm->enemies[gm->enemyCount - 1]; 
 				gm->enemyCount--; 
-			} else { 
-				i++; 
-			}
+			} else i++; 
 		}
 		
 		for (i = 0; i < gm->projectileCount; ) {
@@ -124,100 +115,86 @@ void GameManager_updateLogic(GameManager* gm, double deltaTime) {
 
 void GameManager_renderGraphics(GameManager* gm) {
 	int i;
-	cleardevice();
+	
+	// Raylib 必须在 BeginDrawing 和 EndDrawing 之间渲染
+	BeginDrawing();
+	ClearBackground(BLACK);
 	
 	// 1. 画地图底层
 	Map_draw(&gm->gameMap);
 	
-	// 2. 【已恢复】悬浮建造预览与射程显示
-	int mx, my; 
-	mousepos(&mx, &my); // 获取当前鼠标坐标
+	// 2. 悬浮建造预览 (Raylib 鼠标获取非常简单)
+	int mx = GetMouseX();
+	int my = GetMouseY();
 	int hoverCol = mx / CELL_SIZE; 
 	int hoverRow = my / CELL_SIZE;
 	
-	// 确保鼠标在合法地图范围内，并且当前在游戏进行中
 	if (gm->currentState == PLAYING_LEVEL_1 && hoverRow >= 0 && hoverRow < ROWS && hoverCol >= 0 && hoverCol < COLS) {
-		// 如果是空地，可以建塔
 		if (gm->gameMap.grid[hoverRow][hoverCol] == 0) {
 			Point c = Map_getCenter(hoverRow, hoverCol);
-			
-			// 画一个半透明/较暗的虚影方块代表塔
-			setfillcolor(EGERGB(80, 80, 80));
-			bar(c.x - 20, c.y - 20, c.x + 20, c.y + 20);
-			
-			// 画出白色的射程圆圈 (150 是我们在 Tower_init 里写的射程)
-			setcolor(EGERGB(255, 255, 255));
-			circle(c.x, c.y, 150); 
+			DrawRectangle(c.x - 20, c.y - 20, 40, 40, (Color){80, 80, 80, 255});
+			DrawCircleLines(c.x, c.y, 150, LIGHTGRAY); // 射程圈
 		}
 	}
 	
-	// 3. 画实体（塔和敌人）
+	// 3. 画实体
 	for (i = 0; i < gm->towerCount; i++) Tower_draw(&gm->towers[i]);
 	for (i = 0; i < gm->enemyCount; i++) Enemy_draw(&gm->enemies[i]);
 	
-	// 4. 大本营篝火动画
+	// 4. 大本营呼吸篝火特效
 	Point basePos = gm->gameMap.waypoints[gm->gameMap.waypointCount - 1];
-	double t = (double)clock() / CLOCKS_PER_SEC;
-	int pulse = (int)(sin(t * 8.0) * 6); 
+	// Raylib 提供了极简的 GetTime() 获取程序运行秒数
+	int pulse = (int)(sin(GetTime() * 8.0) * 6); 
 	
-	setfillcolor(EGERGB(255, 80, 0)); 
-	fillcircle(basePos.x, basePos.y, 35 + pulse);
-	setfillcolor(EGERGB(255, 160, 0)); 
-	fillcircle(basePos.x, basePos.y, 25 + pulse/2);
-	setfillcolor(EGERGB(255, 230, 100)); 
-	fillcircle(basePos.x, basePos.y, 15);
+	DrawCircle(basePos.x, basePos.y, 35 + pulse, (Color){255, 80, 0, 255});
+	DrawCircle(basePos.x, basePos.y, 25 + pulse/2, (Color){255, 160, 0, 255});
+	DrawCircle(basePos.x, basePos.y, 15, (Color){255, 230, 100, 255});
 	
-	// 5. 抛物线石块特效
+	// 5. 抛物线石块
 	for (i = 0; i < gm->projectileCount; i++) {
 		double prog = 1.0 - (gm->projectiles[i].life / gm->projectiles[i].maxLife);
 		double cx = gm->projectiles[i].startX + (gm->projectiles[i].targetX - gm->projectiles[i].startX) * prog;
 		double cy = gm->projectiles[i].startY + (gm->projectiles[i].targetY - gm->projectiles[i].startY) * prog;
 		cy -= 80.0 * sin(prog * 3.1415926); 
-		setfillcolor(EGERGB(180, 180, 180));
-		fillcircle((int)cx, (int)cy, 5);
+		DrawCircle((int)cx, (int)cy, 5, (Color){180, 180, 180, 255});
 	}
 	
-	// 6. UI 顶部状态栏
-	setfillcolor(EGERGB(30, 30, 30));
-	bar(0, 0, 1024, 40);
-	char infoText[128];
-	sprintf(infoText, "  Base HP: %d    Money: %d    Wave: %d/3", gm->baseHealth, gm->money, gm->currentWave);
-	setbkmode(TRANSPARENT); 
-	setfont(24, 0, "Consolas");
-	setcolor(EGERGB(255, 215, 0)); 
-	outtextxy(10, 10, infoText);
+	// 6. UI 状态栏 (置于顶层)
+	DrawRectangle(0, 0, 1024, 40, (Color){30, 30, 30, 255}); // 顶部黑条
+	DrawLine(0, 40, 1024, 40, (Color){100, 100, 100, 255});
 	
-	// 7. 伤害数字飘字
+	// Raylib 的文字渲染不需要处理背景透明，默认就是透明的，极其好用
+	// 使用 TextFormat 可以直接像 printf 一样格式化字符串
+	const char* infoText = TextFormat("Base HP: %d    Money: %d    Wave: %d/3", gm->baseHealth, gm->money, gm->currentWave);
+	DrawText(infoText, 12, 12, 20, BLACK); // 黑阴影
+	DrawText(infoText, 10, 10, 20, GOLD);  // 金色主字
+	
+	// 7. 浮动伤害飘字
 	for (i = 0; i < gm->floatTextCount; i++) {
-		char dmgText[16];
-		sprintf(dmgText, "-%d", gm->floatTexts[i].damage);
-		setcolor(EGERGB(255, 50, 50));
-		outtextxy((int)gm->floatTexts[i].x, (int)gm->floatTexts[i].y, dmgText);
+		const char* dmgText = TextFormat("-%d", gm->floatTexts[i].damage);
+		DrawText(dmgText, (int)gm->floatTexts[i].x + 1, (int)gm->floatTexts[i].y + 1, 20, BLACK);
+		DrawText(dmgText, (int)gm->floatTexts[i].x, (int)gm->floatTexts[i].y, 20, RED);
 	}
 	
-	// 8. 【已恢复】资源不足提示文字
+	// 8. 资源不足提示
 	if (gm->warningTimer > 0) {
 		int floatY = gm->warningY - 20 - (int)((1.0 - gm->warningTimer) * 30);
-		setcolor(EGERGB(0, 0, 0));
-		outtextxy(gm->warningX - 40 + 2, floatY + 2, "资源不足!");
-		setcolor(EGERGB(255, 50, 50));
-		outtextxy(gm->warningX - 40, floatY, "资源不足!");
+		DrawText("Need 50 Money!", gm->warningX - 40 + 2, floatY + 2, 20, BLACK);
+		DrawText("Need 50 Money!", gm->warningX - 40, floatY, 20, RED);
 	}
 	
-	// 9. 【已恢复】各种游戏状态结算提示
+	// 9. 游戏状态提示
 	if (!gm->isWaveActive && gm->currentState == PLAYING_LEVEL_1 && gm->currentWave < 3) {
-		char delayText[64]; 
-		sprintf(delayText, "Next Wave in: %.1f s", gm->waveDelayTimer);
-		setcolor(EGERGB(255, 255, 255)); 
-		setfont(40, 0, "Consolas");
-		outtextxy(350, 350, delayText);
+		DrawText(TextFormat("Next Wave in: %.1f s", gm->waveDelayTimer), 350, 350, 40, WHITE);
 	}
 	if (gm->currentState == GAME_OVER) {
-		setcolor(EGERGB(255, 0, 0)); setfont(80, 0, "Consolas"); outtextxy(300, 300, "GAME OVER");
-		setfont(30, 0, "Consolas"); outtextxy(350, 400, "火种熄灭，文明陨落"); 
+		DrawText("GAME OVER", 300, 300, 80, RED);
+		DrawText("The fire went out...", 350, 400, 30, LIGHTGRAY);
 	}
 	if (gm->currentState == VICTORY) {
-		setcolor(EGERGB(0, 255, 0)); setfont(60, 0, "Consolas"); outtextxy(250, 300, "LEVEL 1 CLEARED");
-		setfont(30, 0, "Consolas"); outtextxy(320, 400, "先民挺过了野兽的侵袭...");
+		DrawText("LEVEL 1 CLEARED", 250, 300, 60, GREEN);
+		DrawText("Humanity survived the night...", 320, 400, 30, LIGHTGRAY);
 	}
+	
+	EndDrawing();
 }

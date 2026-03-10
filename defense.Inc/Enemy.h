@@ -1,7 +1,7 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include <graphics.h>
+#include "raylib.h"
 #include "Map.h"
 
 typedef struct {
@@ -10,7 +10,7 @@ typedef struct {
 	int maxHp;               
 	int hp;                  
 	int targetWaypointIndex; 
-	int active;             // C语言中用 int 代表布尔值 (1真, 0假)
+	int active;             
 	int reachedBase;        
 	double hitFlashTimer;    
 } Enemy;

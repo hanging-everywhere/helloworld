@@ -48,7 +48,7 @@ void Tower_update(Tower* t, double deltaTime,
 			enemies[bestEnemyIdx].hitFlashTimer = 0.1; 
 			t->currentCooldown = t->cooldown;
 			
-			// C 语言方式添加石块特效
+			// 发射抛物线石块
 			projs[*projCount].startX = (double)t->x;
 			projs[*projCount].startY = (double)t->y;
 			projs[*projCount].targetX = enemies[bestEnemyIdx].x;
@@ -57,7 +57,7 @@ void Tower_update(Tower* t, double deltaTime,
 			projs[*projCount].maxLife = 0.2;
 			(*projCount)++;
 			
-			// C 语言方式添加飘字特效
+			// 生成伤害飘字
 			fTexts[*fTextCount].x = enemies[bestEnemyIdx].x;
 			fTexts[*fTextCount].y = enemies[bestEnemyIdx].y - 20;
 			fTexts[*fTextCount].damage = t->damage;
@@ -68,8 +68,8 @@ void Tower_update(Tower* t, double deltaTime,
 }
 
 void Tower_draw(Tower* t) {
-	setfillcolor(EGERGB(100, 100, 100));
-	bar(t->x - 20, t->y - 20, t->x + 20, t->y + 20);
-	setfillcolor(EGERGB(40, 40, 40));
-	fillcircle(t->x, t->y, 8);
+	// 粗糙的石堆色方形
+	DrawRectangle(t->x - 20, t->y - 20, 40, 40, (Color){100, 100, 100, 255});
+	// 塔顶深色射击孔
+	DrawCircle(t->x, t->y, 8, (Color){40, 40, 40, 255});
 }

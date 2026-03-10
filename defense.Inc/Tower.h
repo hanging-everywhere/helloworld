@@ -1,10 +1,9 @@
 #ifndef TOWER_H
 #define TOWER_H
 
-#include <graphics.h>
+#include "raylib.h"
 #include "Enemy.h"
 
-// 集中定义所有特效结构体
 typedef struct {
 	double x, y;
 	int damage;
@@ -26,7 +25,6 @@ typedef struct {
 	double currentCooldown;
 } Tower;
 
-// 这里需要传入各个数组及其数量的指针
 void Tower_init(Tower* t, int startX, int startY);
 void Tower_update(Tower* t, double deltaTime, 
 				  Enemy* enemies, int enemyCount, 

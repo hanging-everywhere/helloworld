@@ -1,20 +1,20 @@
 [Project]
-filename = game.dev
-name = game
-UnitCount = 9
-Type = 0
+filename = defense.Inc.dev
+name = defense.Inc
+UnitCount = 12
+Type = 1
 Ver = 3
 Includes = 
 Libs = 
 Bins = 
 ResourceIncludes = 
 MakeIncludes = 
-PrivateResource = game_private.rc
+PrivateResource = 
 Compiler = 
 CppCompiler = 
-Linker = -lgraphics -luuid -lmsimg32 -lgdi32 -limm32 -lole32 -loleaut32 -lwinmm -lgdiplus_@@__@@_
+Linker = -lraylib -lopengl32 -lgdi32 -lwinmm
 ResourceCommand = 
-IsCpp = 1
+IsCpp = 0
 Icon = app.ico
 ExeOutput = 
 ObjectOutput = 
@@ -31,10 +31,10 @@ CommandLine =
 Folders = 
 IncludeVersionInfo = 0
 SupportXPThemes = 0
-CompilerSet = 4
-StaticLink = 1
+CompilerSet = 5
+StaticLink = 0
 AddCharset = 1
-ExecEncoding = SYSTEM
+ExecEncoding = UTF-8
 Encoding = UTF-8
 ModelType = 0
 ClassBrowserType = 0
@@ -44,7 +44,7 @@ UseUTF8 = 1
 
 
 [Unit1]
-FileName = Enemy.h
+FileName = GameManager.h
 CompileCpp = 0
 Folder = 头文件
 Compile = 0
@@ -54,6 +54,32 @@ OverrideBuildCmd = 0
 BuildCmd = 
 FileEncoding = PROJECT
 RealEncoding = UTF-8
+
+
+[Unit2]
+FileName = Map.c
+Folder = 源文件
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+CompileCpp = 0
+
+
+[Unit3]
+FileName = main.c
+Folder = 源文件
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+CompileCpp = 0
 
 
 [VersionInfo]
@@ -69,16 +95,41 @@ FileDescription = Developed using the Red Panda C++ IDE
 InternalName = 
 LegalCopyright = 
 LegalTrademarks = 
-OriginalFilename = game.exe
-ProductName = game
+OriginalFilename = defense.Inc.exe
+ProductName = defense.Inc
 ProductVersion = 0.1.1.1
 AutoIncBuildNr = 0
 SyncProduct = 1
 
 
-[Unit2]
-FileName = Map.cpp
-CompileCpp = 1
+[Unit4]
+FileName = explosion.png
+Folder = 其他文件
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = ASCII
+CompileCpp = 0
+
+
+[Unit5]
+FileName = GameManager.c
+Folder = 源文件
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = 
+CompileCpp = 0
+
+
+[Unit6]
+FileName = Enemy.c
 Folder = 源文件
 Compile = 1
 Link = 1
@@ -87,9 +138,23 @@ OverrideBuildCmd = 0
 BuildCmd = 
 FileEncoding = PROJECT
 RealEncoding = UTF-8
+CompileCpp = 0
 
 
-[Unit3]
+[Unit7]
+FileName = boom.wav
+CompileCpp = 0
+Folder = 其他文件
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = ASCII
+
+
+[Unit8]
 FileName = Tower.h
 CompileCpp = 0
 Folder = 头文件
@@ -102,59 +167,7 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
-[Unit4]
-FileName = GameManager.h
-CompileCpp = 0
-Folder = 头文件
-Compile = 0
-Link = 0
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit5]
-FileName = GameManager.cpp
-CompileCpp = 1
-Folder = 源文件
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit6]
-FileName = Enemy.cpp
-CompileCpp = 1
-Folder = 源文件
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit7]
-FileName = main.cpp
-CompileCpp = 1
-Folder = 源文件
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit8]
+[Unit9]
 FileName = Map.h
 CompileCpp = 0
 Folder = 头文件
@@ -167,9 +180,9 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
-[Unit9]
-FileName = Tower.cpp
-CompileCpp = 1
+[Unit10]
+FileName = Tower.c
+CompileCpp = 0
 Folder = 源文件
 Compile = 1
 Link = 1
@@ -180,30 +193,40 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
+[Unit11]
+FileName = Map
+CompileCpp = 0
+Folder = 其他文件
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = 
+
+
+[Unit12]
+FileName = Enemy.h
+CompileCpp = 0
+Folder = 头文件
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
 [CompilerSettings]
 c_cmd_opt_std = 
-cc_cmd_opt_abort_on_error = 
-cc_cmd_opt_address_sanitizer = 
-cc_cmd_opt_check_iso_conformance = 
-cc_cmd_opt_debug_info = 
-cc_cmd_opt_inhibit_all_warning = 
-cc_cmd_opt_instruction = 
+cc_cmd_opt_debug_info = on
 cc_cmd_opt_no_ms_extensions = on
-cc_cmd_opt_optimize = 2
-cc_cmd_opt_pointer_size = 
-cc_cmd_opt_profile_info = 
-cc_cmd_opt_stack_protector = 
 cc_cmd_opt_std = 
-cc_cmd_opt_syntax_only = 
 cc_cmd_opt_use_pipe = on
-cc_cmd_opt_warning_all = 
-cc_cmd_opt_warning_as_error = 
-cc_cmd_opt_warning_extra = 
-cc_opt_enable_gcc_import_std = 
+cc_cmd_opt_warning_all = on
 cc_opt_error_implicit_int = on
 cc_opt_error_return_type = on
 cc_opt_error_vla = on
-link_cmd_opt_no_console = on
-link_cmd_opt_no_link_stdlib = 
-link_cmd_opt_stack_size = 14
-link_cmd_opt_strip_exe = on
+link_cmd_opt_stack_size = 12
