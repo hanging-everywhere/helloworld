@@ -9,7 +9,7 @@ int main(void) {
 	SetTargetFPS(60);
 	
 	GameManager gm;
-	GameManager_init(&gm);
+	GameManager_init(&gm,1);
 	
 	// 主游戏循环，只要窗口没被关闭就一直运行
 	while (!WindowShouldClose()) {
