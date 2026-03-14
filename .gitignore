@@ -1,6 +1,21 @@
-# 忽略编译产生的文件
+# 编译产物 / Build artifacts
 *.o
 *.exe
 *.debug
+
+# Red Panda IDE 文件 / Red Panda IDE files
 *.layout
 *.bookmarks
+*.dev
+defense.Inc/*.res
+
+# 系统文件 / System files
+.DS_Store
+Thumbs.db
+
+# 日志文件 / Log files
+*.log
+
+# 临时文件 / Temporary files
+*.tmp
+*.bak
