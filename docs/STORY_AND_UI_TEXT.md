@@ -1,29 +1,53 @@
 # 故事与 UI 文字文档 | Story & UI Text Document
 
-**维护者 / Maintainer**: 故事设计者 / Narrative Designer
-**版本 / Version**: 0.1（模板 / Template）
-**状态 / Status**: 🔴 待填写 / Pending — 请故事设计者在 M1 结束前完成初稿
-**最后更新 / Last Updated**: 2026-03-10（CIO 创建模板 / Template created by CIO）
+**维护者 / Maintainer**: 张一奥（Zhang Yi'ao）/ Communicator（协助收集整理 / Assists with collection）
+**版本 / Version**: 0.3（时代世界观已填入 / Era world lore added）
+**状态 / Status**: 🟡 部分填写 / Partially filled — 请在 M3 结束前完成 UI 文字最终版
+**最后更新 / Last Updated**: 2026-03-14（CIO 根据机制设计 v1.0 更新 / Updated per mechanism design v1.0）
 
-> **CIO 说明**：以下部分文字来自原型代码（英文占位文字），供故事设计者参考和替换。
+> **CIO 说明**：以下部分文字来自原型代码（英文占位文字），供参考和替换。
 > 涉及动态变量（`%d`、`%.1f` 等）的文字请勿修改格式符，只修改周围文字。
-> **CIO Note**: Some text below is from the prototype code (English placeholders) for the narrative designer's reference.
-> For text with format specifiers (`%d`, `%.1f`, etc.), do NOT modify the specifier — only the surrounding text.
+> **CIO Note**: Some text below is from prototype code. For format specifiers (`%d`, `%.1f`), do NOT modify the specifier.
 
 ---
 
 ## 1. 世界观简介 | World Overview
 
-> 请故事设计者在此处填写游戏背景故事，100字以内。
-> Please fill in the game background story here, within 100 characters.
+### 1.1 总体背景 | Overall Background
 
-**中文版本**（待填写）：
+**中文版本**：
 
-> 远古时代，部落在险峻的峡谷中安营扎寨。每当黑夜降临，史前猛兽便从四面八方涌来，觊觎部落的篝火与食物。作为守护者，你必须建造石质防御工事，让猛兽寸步难行，守住这最后的火种。
+> 千年城影横跨三个时代——从石器时代的蒙昧，到古代文明的理性，再到科幻未来的星辰。每个时代都有独特的防御哲学：石器时代以石、骨、木、火对抗蛮荒猛兽；古代文明用金属、机械、工艺、秩序构筑精密防线；科幻未来则以能量、力场、意识、维度本身作为武器。守护者必须跨越时代，建造防御工事，守住文明的火种。
 
-**English Version**（待填写 / Pending）：
+**English Version**：
 
-> [Narrative designer: please provide English version]
+> Millennium Shadow spans three eras — from the Ignorance of the Stone Age, to the Rationality of Ancient Civilization, to the Stars of the Sci-Fi Future. Each era has a unique defense philosophy: the Stone Age fights savage beasts with stone, bone, wood, and fire; Ancient Civilization builds precise defenses with metal, machinery, craft, and order; the Sci-Fi Future wields energy, force fields, consciousness, and dimensions as weapons. Guardians must transcend eras to build defenses and protect the flame of civilization.
+
+### 1.2 各时代世界观 | Era-Specific World Lore
+
+**第一时代 · 石器时代 · 蒙昧 / Era 1: Stone Age — Ignorance**
+
+> 石、骨、木、火。
+> 原始人的蒙昧认知，造就了最朴素的防御，同时对自然的崇拜，获得了神的青睐。
+
+> Stone, bone, wood, fire.
+> Primitive humanity's naive understanding creates the most basic defenses, while nature worship earns divine favor.
+
+**第二时代 · 古代文明 · 理性 / Era 2: Ancient Civilization — Rationality**
+
+> 金属、机械、工艺、秩序。
+> 逐渐理解物理规律，用数学和智慧搭建攻防工程。
+
+> Metal, machinery, craft, order.
+> Gradually understanding physical laws, using mathematics and wisdom to build offensive and defensive engineering.
+
+**第三时代 · 科幻未来 · 星辰 / Era 3: Sci-Fi Future — Stars**
+
+> 能量、力场、意识、维度。
+> 用概念和规律本身作为武器。
+
+> Energy, force fields, consciousness, dimensions.
+> Using concepts and laws themselves as weapons.
 
 ---
 
@@ -39,7 +63,7 @@
 ## 3. UI 文字清单 | UI Text List
 
 > **CIO 提示**：带 `%d`、`%.1f` 等格式符的文字，格式符必须保留，只修改周围文字。
-> **CIO Note**: Keep format specifiers (`%d`, `%.1f`) unchanged — only modify surrounding text.
+> **CIO Note**: Keep format specifiers unchanged — only modify surrounding text.
 
 ### 3.1 游戏中 HUD | In-Game HUD
 
@@ -74,7 +98,7 @@
 
 ---
 
-## 5. 故事设计者操作指南 | Guide for Narrative Designer
+## 5. 提交操作指南 | Submission Guide
 
 ### 5.1 如何提交文案更新 | How to Submit Text Updates
 
@@ -91,29 +115,29 @@ git checkout -b docs/update-story-and-ui-text
 
 # ④ 提交
 git add docs/STORY_AND_UI_TEXT.md
-git commit -m "docs: 更新 STORY_AND_UI_TEXT.md，完成所有 UI 文字初稿"
+git commit -m "docs: 更新 STORY_AND_UI_TEXT.md，完成 UI 文字"
 
 # ⑤ 推送并发起 PR
 git push -u origin docs/update-story-and-ui-text
-# 在 GitHub 发起 PR，Reviewer 指定 CIO
+# 在 GitHub 发起 PR，Reviewer 指定 CIO（符雅翔）
 ```
 
 ### 5.2 重要格式规则 | Important Format Rules
 
 ```
 ✅ 保留所有 %d、%.1f、%s 等格式符不变
-   Keep all %d, %.1f, %s format specifiers unchanged
+   Keep all format specifiers unchanged
 
 ✅ 中英文字均需提供（工程师可能用到任一版本）
    Provide both Chinese and English text
 
 ✅ 文字长度尽量适中，避免超出 UI 框
-   Keep text length reasonable — avoid overflowing UI areas
+   Keep text length reasonable
 
 ❌ 不要修改格式符本身（如将 %d 改为 %s）
-   Do NOT change the specifier type (e.g., %d to %s)
+   Do NOT change the specifier type
 
-❌ 不要删除格式符（如将 "第 %d 波" 改为 "第三波"——工程师需要动态数字）
+❌ 不要删除格式符（如将 "第 %d 波" 改为 "第三波"）
    Do NOT remove specifiers — engineers need dynamic values
 ```
 
@@ -123,12 +147,12 @@ git push -u origin docs/update-story-and-ui-text
 
 | 事项 / Item | 优先级 / Priority | 截止 / Deadline |
 |---|---|---|
-| 世界观简介（中英双语）| 🔴 高 | M1 结束 |
-| 所有 HUD 文字最终版 | 🔴 高 | M1 结束 |
-| GAME OVER / 胜利画面文字 | 🔴 高 | M1 结束 |
+| 所有 HUD 文字最终版 | 🟡 中 | M3 结束（3.27）|
+| GAME OVER / 胜利画面文字 | 🟡 中 | M3 结束（3.27）|
+| 世界观英文版本 | 🟡 中 | M3 结束（3.27）|
 | 是否需要"开始游戏"主菜单？| 🟡 中 | M2 前确认 |
 
 ---
 
-*维护者：故事设计者（模板由 CIO-TD 创建）*
-*Maintained by: Narrative Designer (template created by CIO-TD)*
+*维护者：张一奥 / Communicator（模板由 CIO-TD 创建并更新）*
+*Maintained by: Zhang Yi'ao / Communicator (template created and updated by CIO-TD)*

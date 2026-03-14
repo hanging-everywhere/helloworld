@@ -1,0 +1,50 @@
+# Project: defense.Inc
+# Makefile created by Red Panda C++ 3.4.3279
+
+CXX      = "g++.exe"
+CC       = "gcc.exe"
+WINDRES  = "windres.exe"
+RM       = del /q /f
+CD       = cd /d
+LIBS     = "-Wl,--stack,12582912" "-lraylib" "-lopengl32" "-lgdi32" "-lwinmm"
+INCS     = 
+CXXINCS  = 
+CXXFLAGS = $(CXXINCS) "-g3" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=return-type" "-Werror=vla" "-D_DEBUG"
+CFLAGS   = $(INCS) "-g3" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=implicit-int" "-Werror=return-type" "-Werror=vla" "-D_DEBUG"
+NASM_FLAGS   =  "-f" "elf64" "-g"
+WINDRESFLAGS = 
+RES      = defense_private.res
+OBJ      = Map.o main.o GameManager.o Enemy.o Tower.o $(RES)
+BIN      = defense.Inc.exe
+LINKOBJ  = "Map.o" "main.o" "GameManager.o" "Enemy.o" "Tower.o" "defense_private.res"
+CLEANOBJ = "Map.o" "main.o" "GameManager.o" "Enemy.o" "Tower.o" "defense_private.res" "defense.Inc.exe"
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	-$(RM) $(CLEANOBJ) >NUL 2>&1
+
+defense.Inc.exe: $(OBJ)
+
+	$(CC) $(LINKOBJ) -o "defense.Inc.exe" $(LIBS)
+
+Map.o: Map.c Map.h
+	$(CC) -c "Map.c" -o "Map.o" $(CFLAGS) 
+
+main.o: main.c GameManager.h Tower.h Map.h Enemy.h
+	$(CC) -c "main.c" -o "main.o" $(CFLAGS) 
+
+GameManager.o: GameManager.c GameManager.h Tower.h Map.h Enemy.h
+	$(CC) -c "GameManager.c" -o "GameManager.o" $(CFLAGS) 
+
+Enemy.o: Enemy.c Map.h Enemy.h
+	$(CC) -c "Enemy.c" -o "Enemy.o" $(CFLAGS) 
+
+Tower.o: Tower.c Tower.h Map.h Enemy.h
+	$(CC) -c "Tower.c" -o "Tower.o" $(CFLAGS) 
+
+defense_private.res: defense_private.rc 
+	$(WINDRES) -i "defense_private.rc" --input-format=rc -o "defense_private.res" -O coff $(WINDRESFLAGS) 
+
