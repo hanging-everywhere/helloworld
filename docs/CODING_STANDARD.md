@@ -3,7 +3,7 @@
 **维护者 / Maintainer**: CIO-TD
 **版本 / Version**: 1.0
 **状态 / Status**: ✅ 已发布，全员强制执行 / Published, mandatory for all members
-**最后更新 / Last Updated**: 2026-03-10
+**最后更新 / Last Updated**: 2026-03-14
 
 > 本文档为全员必读文档。违反任何一条规范，PR 将被标记为 NEEDS WORK 并要求修正。
 > This document is mandatory reading for all members. Any violation will result in a NEEDS WORK review and required correction.
