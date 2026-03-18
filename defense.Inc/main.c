@@ -24,7 +24,7 @@ int main(void) {
 		// 渲染图形
 		GameManager_renderGraphics(&gm);
 	}
-	
+	GameManager_unloadAllTextures(&gm);
 	// 关闭窗口，释放资源
 	CloseWindow();
 	

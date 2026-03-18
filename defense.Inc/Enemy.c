@@ -9,7 +9,7 @@ void Enemy_init(Enemy* e, Point startPos, int id) {
 	e->baseSpeed = 60.0;     
 	e->currentSpeed = e->baseSpeed; 
 	
-	e->maxHp = 100;              
+	e->maxHp = 10;              
 	e->hp = e->maxHp;
 	e->targetWaypointIndex = 1;  
 	e->active = 1;
@@ -23,6 +23,7 @@ void Enemy_init(Enemy* e, Point startPos, int id) {
 	e->dotTimer = 0.0;
 	e->dotTickTimer = 0.0;
 	e->dotDamage = 0;
+	e->isInvisible = 0;
 	
 	e->currentFrame = 0;
 	e->framesCounter = 0;
@@ -75,7 +76,6 @@ void Enemy_update(Enemy* e, double deltaTime, Point* waypoints, int waypointCoun
 			e->targetWaypointIndex++;
 		} else {
 			moveDist = e->currentSpeed * deltaTime; 
-			// 【修复】：把 distance 改成了 dist
 			if (moveDist > dist) moveDist = dist; 
 			e->x += (dx / dist) * moveDist;
 			e->y += (dy / dist) * moveDist;
@@ -119,4 +119,7 @@ void Enemy_draw(Enemy* e, Texture2D spriteSheet) {
 	currentBar = (int)((double)e->hp / e->maxHp * barWidth);
 	DrawRectangle((int)e->x - 15, (int)e->y + 20, barWidth, 4, (Color){100, 0, 0, 255}); 
 	DrawRectangle((int)e->x - 15, (int)e->y + 20, currentBar, 4, (Color){0, 200, 0, 255}); 
+	if (e->stunTimer > 0) {
+		DrawText("Zzz", e->x - 12, e->y - 35, 14, YELLOW); // 眩晕特效
+	}
 }

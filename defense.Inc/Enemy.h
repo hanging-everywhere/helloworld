@@ -26,7 +26,8 @@ typedef struct {
 	Rectangle frameRec;     
 	int currentFrame;       
 	int framesCounter;      
-	int framesSpeed;        
+	int framesSpeed;    
+	int isInvisible; //隐身状态
 	
 	// --- 【核心新增：异常状态系统 (Debuffs)】 ---
 	double stunTimer;        // 眩晕倒计时：大于0时无法移动

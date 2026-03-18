@@ -5,59 +5,67 @@
 #include "Map.h"
 #include "Enemy.h"
 #include "Tower.h"
+#include "Base.h"
 
 #define MAX_ENEMIES 200
 #define MAX_TOWERS 100
 #define MAX_PROJECTILES 300
 #define MAX_FLOAT_TEXTS 300
+#define MAX_TRAPS 100 
 
-// 定义三个时代
-enum Era { 
-	ERA_STONE,      // 0: 石器时代
-	ERA_ANCIENT,    // 1: 古代文明
-	ERA_FUTURE      // 2: 科幻未来
-};
+enum Era { ERA_STONE, ERA_ANCIENT, ERA_FUTURE };
+enum GameState { MENU, PLAYING_LEVEL_1, PLAYING_LEVEL_2, PLAYING_LEVEL_3, LEVEL_TRANSITION, GAME_OVER, VICTORY };
 
-// 扩展游戏状态
-enum GameState { 
-	MENU, 
-	PLAYING_LEVEL_1, 
-	PLAYING_LEVEL_2, 
-	PLAYING_LEVEL_3, 
-	LEVEL_TRANSITION,
-	GAME_OVER, 
-	VICTORY 
-};
+typedef struct {
+	double x, y;
+	double life;
+	int active;
+} Trap;
 
 typedef struct {
 	enum GameState currentState;
-	enum Era currentEra;          // 记录当前时代
+	enum Era currentEra;          
 	
-	Map gameMap;
+	Map  gameMap;
+	Base base;
 	
-	Enemy enemies[MAX_ENEMIES]; 
-	int enemyCount;
-	Tower towers[MAX_TOWERS]; 
-	int towerCount;
-	FloatingText floatTexts[MAX_FLOAT_TEXTS];
-	int floatTextCount;
+	Enemy  enemies[MAX_ENEMIES]; 
+	int    enemyCount;
+	Tower  towers[MAX_TOWERS]; 
+	int    towerCount;
+	FloatingText     floatTexts[MAX_FLOAT_TEXTS];
+	int              floatTextCount;
 	VisualProjectile projectiles[MAX_PROJECTILES];
-	int projectileCount;
+	int              projectileCount;
+	Trap traps[MAX_TRAPS]; 
 	
-	int baseHealth, money, currentWave;
-	int enemiesSpawned, enemiesToSpawn, isWaveActive;        
+	int currentSelectedTower;
+	int selectedTowerIndex;  // -1=无，>=0=选中已建塔
+	int baseSelected;        // 1=点击的是基地（显示基地升级面板）
+	
+	int    baseHealth;       // 与 base.hp 同步
+	int    currentWave;
+	int    wood, stone, metal, material;
+	double resourceTimer;
+	int    enemiesSpawned, enemiesToSpawn, isWaveActive;        
 	double spawnTimer, currentSpawnInterval, waveDelayTimer;     
 	double warningTimer;   
-	int warningX, warningY;
+	int    warningX, warningY;
 	
-	Texture2D skeletonTexture; // 骷髅怪的贴图
+	Texture2D bgMapTexture1;
+	Texture2D skeletonTexture;
+	Texture2D slingTexture;
+	Texture2D bonespearTexture;
+	
 } GameManager;
 
-// 注意这里多了一个 startLevel 参数
 void GameManager_init(GameManager* gm, int startLevel);
 void GameManager_startNextWave(GameManager* gm);
+void GameManager_loadAllTextures(GameManager* gm);
+void GameManager_unloadAllTextures(GameManager* gm);
 void GameManager_processInput(GameManager* gm);
 void GameManager_updateLogic(GameManager* gm, double deltaTime);
 void GameManager_renderGraphics(GameManager* gm);
+void GameManager_upgradeTower(GameManager* gm, int path);
 
 #endif
