@@ -5,7 +5,7 @@ int main(void) {
 	// 初始化窗口，1024x768
 	InitWindow(1024, 768, "千年城影  - 旧石器时代防线");
 	
-	// 自动锁定 60 帧！不再需要手动 delay
+	// 自动锁定 60 帧
 	SetTargetFPS(60);
 	
 	GameManager gm;

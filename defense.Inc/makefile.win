@@ -14,10 +14,10 @@ CFLAGS   = $(INCS) "-g3" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=implicit-
 NASM_FLAGS   =  "-f" "elf64" "-g"
 WINDRESFLAGS = 
 RES      = defense_private.res
-OBJ      = Enemy.o Map.o Base.o main.o Tower.o GameManager.o $(RES)
+OBJ      = Base.o GameManager.o Map.o main.o Enemy.o Tower.o $(RES)
 BIN      = defense.Inc.exe
-LINKOBJ  = "Enemy.o" "Map.o" "Base.o" "main.o" "Tower.o" "GameManager.o" "defense_private.res"
-CLEANOBJ = "Enemy.o" "Map.o" "Base.o" "main.o" "Tower.o" "GameManager.o" "defense_private.res" "defense.Inc.exe"
+LINKOBJ  = "Base.o" "GameManager.o" "Map.o" "main.o" "Enemy.o" "Tower.o" "defense_private.res"
+CLEANOBJ = "Base.o" "GameManager.o" "Map.o" "main.o" "Enemy.o" "Tower.o" "defense_private.res" "defense.Inc.exe"
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -30,23 +30,23 @@ defense.Inc.exe: $(OBJ)
 
 	$(CC) $(LINKOBJ) -o "defense.Inc.exe" $(LIBS)
 
-Enemy.o: Enemy.c Map.h Enemy.h
-	$(CC) -c "Enemy.c" -o "Enemy.o" $(CFLAGS) 
+Base.o: Base.c Base.h Map.h Enemy.h Tower.h
+	$(CC) -c "Base.c" -o "Base.o" $(CFLAGS) 
+
+GameManager.o: GameManager.c Base.h Map.h GameManager.h Enemy.h Tower.h
+	$(CC) -c "GameManager.c" -o "GameManager.o" $(CFLAGS) 
 
 Map.o: Map.c Map.h
 	$(CC) -c "Map.c" -o "Map.o" $(CFLAGS) 
 
-Base.o: Base.c Map.h Tower.h Enemy.h Base.h
-	$(CC) -c "Base.c" -o "Base.o" $(CFLAGS) 
-
-main.o: main.c Map.h Tower.h Enemy.h GameManager.h
+main.o: main.c Base.h Map.h GameManager.h Enemy.h Tower.h
 	$(CC) -c "main.c" -o "main.o" $(CFLAGS) 
 
-Tower.o: Tower.c Map.h Tower.h Enemy.h
-	$(CC) -c "Tower.c" -o "Tower.o" $(CFLAGS) 
+Enemy.o: Enemy.c Map.h Enemy.h
+	$(CC) -c "Enemy.c" -o "Enemy.o" $(CFLAGS) 
 
-GameManager.o: GameManager.c Map.h Tower.h Enemy.h GameManager.h
-	$(CC) -c "GameManager.c" -o "GameManager.o" $(CFLAGS) 
+Tower.o: Tower.c Map.h Enemy.h Tower.h
+	$(CC) -c "Tower.c" -o "Tower.o" $(CFLAGS) 
 
 defense_private.res: defense_private.rc 
 	$(WINDRES) -i "defense_private.rc" --input-format=rc -o "defense_private.res" -O coff $(WINDRESFLAGS) 

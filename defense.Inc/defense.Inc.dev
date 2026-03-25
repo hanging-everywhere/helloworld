@@ -44,7 +44,7 @@ UseUTF8 = 1
 
 
 [Unit1]
-FileName = Enemy.c
+FileName = Base.c
 CompileCpp = 0
 Folder = 源文件
 Compile = 1
@@ -57,7 +57,7 @@ RealEncoding = UTF-8
 
 
 [Unit2]
-FileName = Map.h
+FileName = Base.h
 Folder = 头文件
 Compile = 0
 Link = 0
@@ -70,15 +70,15 @@ CompileCpp = 0
 
 
 [Unit3]
-FileName = Map.c
-Folder = 源文件
-Compile = 1
-Link = 1
+FileName = explosion.png
+Folder = 其他文件
+Compile = 0
+Link = 0
 Priority = 1000
 OverrideBuildCmd = 0
 BuildCmd = 
 FileEncoding = PROJECT
-RealEncoding = UTF-8
+RealEncoding = ASCII
 CompileCpp = 0
 
 
@@ -103,7 +103,7 @@ SyncProduct = 1
 
 
 [Unit4]
-FileName = Base.c
+FileName = GameManager.c
 Folder = 源文件
 Compile = 1
 Link = 1
@@ -111,12 +111,12 @@ Priority = 1000
 OverrideBuildCmd = 0
 BuildCmd = 
 FileEncoding = PROJECT
-RealEncoding = 
+RealEncoding = UTF-8
 CompileCpp = 0
 
 
 [Unit5]
-FileName = Map
+FileName = boom.wav
 Folder = 其他文件
 Compile = 0
 Link = 0
@@ -129,7 +129,7 @@ CompileCpp = 0
 
 
 [Unit6]
-FileName = Tower.h
+FileName = Map.h
 Folder = 头文件
 Compile = 0
 Link = 0
@@ -142,20 +142,7 @@ CompileCpp = 0
 
 
 [Unit7]
-FileName = Enemy.h
-CompileCpp = 0
-Folder = 头文件
-Compile = 0
-Link = 0
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
-
-[Unit8]
-FileName = boom.wav
+FileName = Map
 CompileCpp = 0
 Folder = 其他文件
 Compile = 0
@@ -167,8 +154,8 @@ FileEncoding = PROJECT
 RealEncoding = ASCII
 
 
-[Unit9]
-FileName = main.c
+[Unit8]
+FileName = Map.c
 CompileCpp = 0
 Folder = 源文件
 Compile = 1
@@ -180,7 +167,7 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
-[Unit10]
+[Unit9]
 FileName = GameManager.h
 CompileCpp = 0
 Folder = 头文件
@@ -193,8 +180,21 @@ FileEncoding = PROJECT
 RealEncoding = UTF-8
 
 
+[Unit10]
+FileName = main.c
+CompileCpp = 0
+Folder = 源文件
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
 [Unit11]
-FileName = Tower.c
+FileName = Enemy.c
 CompileCpp = 0
 Folder = 源文件
 Compile = 1
@@ -207,20 +207,20 @@ RealEncoding = UTF-8
 
 
 [Unit12]
-FileName = explosion.png
+FileName = Enemy.h
 CompileCpp = 0
-Folder = 其他文件
+Folder = 头文件
 Compile = 0
 Link = 0
 Priority = 1000
 OverrideBuildCmd = 0
 BuildCmd = 
 FileEncoding = PROJECT
-RealEncoding = ASCII
+RealEncoding = UTF-8
 
 
 [Unit13]
-FileName = GameManager.c
+FileName = Tower.c
 CompileCpp = 0
 Folder = 源文件
 Compile = 1
@@ -233,7 +233,7 @@ RealEncoding = UTF-8
 
 
 [Unit14]
-FileName = Base.h
+FileName = Tower.h
 CompileCpp = 0
 Folder = 头文件
 Compile = 0

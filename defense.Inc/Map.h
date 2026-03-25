@@ -18,12 +18,11 @@ typedef struct {
 	int x, y; 
 } Point;
 
+//结构体包含某一游戏组分的全部信息
 typedef struct {
 	int grid[ROWS][COLS];         
 	Point waypoints[MAX_WAYPOINTS]; 
 	int waypointCount;              
-	
-	// 把背景贴图变量加回来！
 	Texture2D bgImg;  
 } Map;
 
