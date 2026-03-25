@@ -14,10 +14,10 @@ CFLAGS   = $(INCS) "-g3" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=implicit-
 NASM_FLAGS   =  "-f" "elf64" "-g"
 WINDRESFLAGS = 
 RES      = defense_private.res
-OBJ      = Base.o GameManager.o Map.o main.o Enemy.o Tower.o $(RES)
-BIN      = defense.Inc.exe
-LINKOBJ  = "Base.o" "GameManager.o" "Map.o" "main.o" "Enemy.o" "Tower.o" "defense_private.res"
-CLEANOBJ = "Base.o" "GameManager.o" "Map.o" "main.o" "Enemy.o" "Tower.o" "defense_private.res" "defense.Inc.exe"
+OBJ      = src/Map.o src/Tower.o src/main.o src/Enemy.o src/Base.o src/GameManager.o $(RES)
+BIN      = defense_Inc.exe
+LINKOBJ  = "src/Map.o" "src/Tower.o" "src/main.o" "src/Enemy.o" "src/Base.o" "src/GameManager.o" "defense_private.res"
+CLEANOBJ = "src\Map.o" "src\Tower.o" "src\main.o" "src\Enemy.o" "src\Base.o" "src\GameManager.o" "defense_private.res" "defense_Inc.exe"
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -26,27 +26,27 @@ all: all-before $(BIN) all-after
 clean: clean-custom
 	-$(RM) $(CLEANOBJ) >NUL 2>&1
 
-defense.Inc.exe: $(OBJ)
+defense_Inc.exe: $(OBJ)
 
-	$(CC) $(LINKOBJ) -o "defense.Inc.exe" $(LIBS)
+	$(CC) $(LINKOBJ) -o "defense_Inc.exe" $(LIBS)
 
-Base.o: Base.c Base.h Map.h Enemy.h Tower.h
-	$(CC) -c "Base.c" -o "Base.o" $(CFLAGS) 
+src/Map.o: src/Map.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+	$(CC) -c "src/Map.c" -o "src/Map.o" $(CFLAGS) 
 
-GameManager.o: GameManager.c Base.h Map.h GameManager.h Enemy.h Tower.h
-	$(CC) -c "GameManager.c" -o "GameManager.o" $(CFLAGS) 
+src/Tower.o: src/Tower.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+	$(CC) -c "src/Tower.c" -o "src/Tower.o" $(CFLAGS) 
 
-Map.o: Map.c Map.h
-	$(CC) -c "Map.c" -o "Map.o" $(CFLAGS) 
+src/main.o: src/main.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+	$(CC) -c "src/main.c" -o "src/main.o" $(CFLAGS) 
 
-main.o: main.c Base.h Map.h GameManager.h Enemy.h Tower.h
-	$(CC) -c "main.c" -o "main.o" $(CFLAGS) 
+src/Enemy.o: src/Enemy.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+	$(CC) -c "src/Enemy.c" -o "src/Enemy.o" $(CFLAGS) 
 
-Enemy.o: Enemy.c Map.h Enemy.h
-	$(CC) -c "Enemy.c" -o "Enemy.o" $(CFLAGS) 
+src/Base.o: src/Base.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+	$(CC) -c "src/Base.c" -o "src/Base.o" $(CFLAGS) 
 
-Tower.o: Tower.c Map.h Enemy.h Tower.h
-	$(CC) -c "Tower.c" -o "Tower.o" $(CFLAGS) 
+src/GameManager.o: src/GameManager.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+	$(CC) -c "src/GameManager.c" -o "src/GameManager.o" $(CFLAGS) 
 
 defense_private.res: defense_private.rc 
 	$(WINDRES) -i "defense_private.rc" --input-format=rc -o "defense_private.res" -O coff $(WINDRESFLAGS) 
