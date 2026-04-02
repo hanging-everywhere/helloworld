@@ -6,18 +6,18 @@ CC       = "gcc.exe"
 WINDRES  = "windres.exe"
 RM       = del /q /f
 CD       = cd /d
-LIBS     = "-Wl,--stack,12582912" "-lraylib" "-lopengl32" "-lgdi32" "-lwinmm"
+LIBS     = "-Wl,--stack,12582912" "-lraylib" "-lopengl32" "-lgdi32" "-lwinmm" "-lcomdlg32" "-lole32" "-static" "-static-libgcc" "-mwindows"
 INCS     = 
 CXXINCS  = 
-CXXFLAGS = $(CXXINCS) "-g3" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=return-type" "-Werror=vla" "-D_DEBUG"
-CFLAGS   = $(INCS) "-g3" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=implicit-int" "-Werror=return-type" "-Werror=vla" "-D_DEBUG"
+CXXFLAGS = $(CXXINCS) "-O2" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=return-type" "-Werror=vla"
+CFLAGS   = $(INCS) "-O2" "-fno-ms-extensions" "-pipe" "-Wall" "-Werror=implicit-int" "-Werror=return-type" "-Werror=vla"
 NASM_FLAGS   =  "-f" "elf64" "-g"
 WINDRESFLAGS = 
 RES      = defense_private.res
-OBJ      = src/Map.o src/Tower.o src/main.o src/Enemy.o src/Base.o src/GameManager.o $(RES)
+OBJ      = src/core/audio.o src/ui/settings.o src/utils/save.o src/core/game_update.o src/utils/dataload.o src/tower/tower_future.o src/tower/tower.o src/core/game_render.o src/tower/tower_draw.o src/utils/utils.o src/enemy/enemy.o src/map/map.o src/ui/menu.o src/base/base.o src/narrative/narrative.o src/projectile/projectile.o src/core/game.o src/main.o src/ui/ui.o src/tower/tower_ancient.o $(RES)
 BIN      = defense_Inc.exe
-LINKOBJ  = "src/Map.o" "src/Tower.o" "src/main.o" "src/Enemy.o" "src/Base.o" "src/GameManager.o" "defense_private.res"
-CLEANOBJ = "src\Map.o" "src\Tower.o" "src\main.o" "src\Enemy.o" "src\Base.o" "src\GameManager.o" "defense_private.res" "defense_Inc.exe"
+LINKOBJ  = "src/core/audio.o" "src/ui/settings.o" "src/utils/save.o" "src/core/game_update.o" "src/utils/dataload.o" "src/tower/tower_future.o" "src/tower/tower.o" "src/core/game_render.o" "src/tower/tower_draw.o" "src/utils/utils.o" "src/enemy/enemy.o" "src/map/map.o" "src/ui/menu.o" "src/base/base.o" "src/narrative/narrative.o" "src/projectile/projectile.o" "src/core/game.o" "src/main.o" "src/ui/ui.o" "src/tower/tower_ancient.o" "defense_private.res"
+CLEANOBJ = "src\core\audio.o" "src\ui\settings.o" "src\utils\save.o" "src\core\game_update.o" "src\utils\dataload.o" "src\tower\tower_future.o" "src\tower\tower.o" "src\core\game_render.o" "src\tower\tower_draw.o" "src\utils\utils.o" "src\enemy\enemy.o" "src\map\map.o" "src\ui\menu.o" "src\base\base.o" "src\narrative\narrative.o" "src\projectile\projectile.o" "src\core\game.o" "src\main.o" "src\ui\ui.o" "src\tower\tower_ancient.o" "defense_private.res" "defense_Inc.exe"
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -30,23 +30,65 @@ defense_Inc.exe: $(OBJ)
 
 	$(CC) $(LINKOBJ) -o "defense_Inc.exe" $(LIBS)
 
-src/Map.o: src/Map.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
-	$(CC) -c "src/Map.c" -o "src/Map.o" $(CFLAGS) 
+src/core/audio.o: src/core/audio.c src/core/audio.h
+	$(CC) -c "src/core/audio.c" -o "src/core/audio.o" $(CFLAGS) 
 
-src/Tower.o: src/Tower.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
-	$(CC) -c "src/Tower.c" -o "src/Tower.o" $(CFLAGS) 
+src/ui/settings.o: src/ui/settings.c src/map/map.h src/enemy/enemy.h src/narrative/narrative.h src/utils/save.h src/projectile/projectile.h src/core/game.h src/tower/tower.h src/ui/settings.h src/utils/dataload.h src/core/audio.h src/core/scale.h src/base/base.h
+	$(CC) -c "src/ui/settings.c" -o "src/ui/settings.o" $(CFLAGS) 
 
-src/main.o: src/main.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
+src/utils/save.o: src/utils/save.c src/utils/save.h
+	$(CC) -c "src/utils/save.c" -o "src/utils/save.o" $(CFLAGS) 
+
+src/core/game_update.o: src/core/game_update.c src/map/map.h src/enemy/enemy.h src/narrative/narrative.h src/utils/save.h src/projectile/projectile.h src/core/game.h src/tower/tower.h src/ui/menu.h src/ui/settings.h src/utils/dataload.h src/core/audio.h src/core/scale.h src/base/base.h
+	$(CC) -c "src/core/game_update.c" -o "src/core/game_update.o" $(CFLAGS) 
+
+src/utils/dataload.o: src/utils/dataload.c src/utils/dataload.h
+	$(CC) -c "src/utils/dataload.c" -o "src/utils/dataload.o" $(CFLAGS) 
+
+src/tower/tower_future.o: src/tower/tower_future.c src/map/map.h src/enemy/enemy.h src/projectile/projectile.h src/tower/tower_internal.h src/tower/tower.h
+	$(CC) -c "src/tower/tower_future.c" -o "src/tower/tower_future.o" $(CFLAGS) 
+
+src/tower/tower.o: src/tower/tower.c src/map/map.h src/enemy/enemy.h src/projectile/projectile.h src/tower/tower_internal.h src/tower/tower.h
+	$(CC) -c "src/tower/tower.c" -o "src/tower/tower.o" $(CFLAGS) 
+
+src/core/game_render.o: src/core/game_render.c src/map/map.h src/enemy/enemy.h src/narrative/narrative.h src/utils/save.h src/projectile/projectile.h src/core/game.h src/tower/tower.h src/ui/menu.h src/ui/settings.h src/utils/dataload.h src/core/audio.h src/core/scale.h src/base/base.h
+	$(CC) -c "src/core/game_render.c" -o "src/core/game_render.o" $(CFLAGS) 
+
+src/tower/tower_draw.o: src/tower/tower_draw.c src/map/map.h src/enemy/enemy.h src/projectile/projectile.h src/tower/tower_internal.h src/tower/tower.h
+	$(CC) -c "src/tower/tower_draw.c" -o "src/tower/tower_draw.o" $(CFLAGS) 
+
+src/utils/utils.o: src/utils/utils.c
+	$(CC) -c "src/utils/utils.c" -o "src/utils/utils.o" $(CFLAGS) 
+
+src/enemy/enemy.o: src/enemy/enemy.c src/map/map.h src/enemy/enemy.h
+	$(CC) -c "src/enemy/enemy.c" -o "src/enemy/enemy.o" $(CFLAGS) 
+
+src/map/map.o: src/map/map.c src/map/map.h
+	$(CC) -c "src/map/map.c" -o "src/map/map.o" $(CFLAGS) 
+
+src/ui/menu.o: src/ui/menu.c src/map/map.h src/enemy/enemy.h src/narrative/narrative.h src/utils/save.h src/projectile/projectile.h src/core/game.h src/tower/tower.h src/ui/menu.h src/utils/dataload.h src/core/audio.h src/core/scale.h src/base/base.h
+	$(CC) -c "src/ui/menu.c" -o "src/ui/menu.o" $(CFLAGS) 
+
+src/base/base.o: src/base/base.c src/map/map.h src/enemy/enemy.h src/projectile/projectile.h src/base/base.h
+	$(CC) -c "src/base/base.c" -o "src/base/base.o" $(CFLAGS) 
+
+src/narrative/narrative.o: src/narrative/narrative.c src/narrative/narrative.h
+	$(CC) -c "src/narrative/narrative.c" -o "src/narrative/narrative.o" $(CFLAGS) 
+
+src/projectile/projectile.o: src/projectile/projectile.c src/projectile/projectile.h
+	$(CC) -c "src/projectile/projectile.c" -o "src/projectile/projectile.o" $(CFLAGS) 
+
+src/core/game.o: src/core/game.c src/map/map.h src/enemy/enemy.h src/narrative/narrative.h src/utils/save.h src/projectile/projectile.h src/core/game.h src/tower/tower.h src/utils/dataload.h src/core/audio.h src/base/base.h
+	$(CC) -c "src/core/game.c" -o "src/core/game.o" $(CFLAGS) 
+
+src/main.o: src/main.c src/map/map.h src/enemy/enemy.h src/narrative/narrative.h src/utils/save.h src/projectile/projectile.h src/core/game.h src/tower/tower.h src/utils/dataload.h src/core/audio.h src/base/base.h
 	$(CC) -c "src/main.c" -o "src/main.o" $(CFLAGS) 
 
-src/Enemy.o: src/Enemy.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
-	$(CC) -c "src/Enemy.c" -o "src/Enemy.o" $(CFLAGS) 
+src/ui/ui.o: src/ui/ui.c src/map/map.h src/ui/ui.h
+	$(CC) -c "src/ui/ui.c" -o "src/ui/ui.o" $(CFLAGS) 
 
-src/Base.o: src/Base.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
-	$(CC) -c "src/Base.c" -o "src/Base.o" $(CFLAGS) 
-
-src/GameManager.o: src/GameManager.c src/Tower.h src/Base.h src/GameManager.h src/Map.h src/Enemy.h
-	$(CC) -c "src/GameManager.c" -o "src/GameManager.o" $(CFLAGS) 
+src/tower/tower_ancient.o: src/tower/tower_ancient.c src/map/map.h src/enemy/enemy.h src/projectile/projectile.h src/tower/tower_internal.h src/tower/tower.h
+	$(CC) -c "src/tower/tower_ancient.c" -o "src/tower/tower_ancient.o" $(CFLAGS) 
 
 defense_private.res: defense_private.rc 
 	$(WINDRES) -i "defense_private.rc" --input-format=rc -o "defense_private.res" -O coff $(WINDRESFLAGS) 
